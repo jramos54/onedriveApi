@@ -1,7 +1,6 @@
 import aiohttp,json, os
 from dotenv import load_dotenv
 import requests
-from microsoftgraph.client import Client
 import msal
 
 
@@ -83,6 +82,7 @@ class AppApiOneDrive:
         self.client_id = os.getenv("CLIENT_ID")
         self.tenant_id = os.getenv("TENANT")
         self.client_secret = os.getenv("CLIENT_SECRET")
+        self.iscam_user = os.getenv("USER_ISCAM")
         self.access_token = None
         self.id_user = None
         self.drive_shared_id=None
@@ -104,7 +104,7 @@ class AppApiOneDrive:
                 self.access_token = resp['access_token']
 
     async def get_idUser(self):
-        ID_USER_URL = "https://graph.microsoft.com/v1.0/users/rpausr.01@iscam.com"
+        ID_USER_URL = f"https://graph.microsoft.com/v1.0/users/{self.iscam_user}"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
             "Content-Type": "application/json"
@@ -113,6 +113,7 @@ class AppApiOneDrive:
         async with aiohttp.ClientSession() as session:
             async with session.get(ID_USER_URL, headers=headers) as response:
                 resp = await response.json()
+                print(resp)
                 self.id_user = resp['id']
 
     async def upload_file(self, onedrivefile, onedrivepath, localpath):
