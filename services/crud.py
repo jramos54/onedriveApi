@@ -72,6 +72,8 @@ def get_onedrive(
     elif periodo is not None:
         query = query.filter(RegistroUpload.periodo == periodo)
 
+    query = query.order_by(RegistroUpload.id)
+    
     start = (page - 1) * limit
     items = query.offset(start).limit(limit).all()
 

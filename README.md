@@ -5,10 +5,13 @@
 
 ## eliminar el entorno virtual anterior (Solo para cuando se cambia de MySQL a SQL server)
     rm -r venv
+    
 ## Creación de un entorno virtual
     python -m venv venv
+
 ## Actualizar pip
     python -m pip install --upgrade pip
+
 ## Activación del entorno virtual
     venv/Scripts/activate
 
