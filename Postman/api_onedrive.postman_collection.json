@@ -290,225 +290,925 @@
 			]
 		},
 		{
-			"name": "getToken",
-			"event": [
+			"name": "test_local",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();\r",
-							"pm.collectionVariables.set(\"token\", jsonData.access_token);\r",
-							""
+					"name": "getToken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.collectionVariables.set(\"token\", jsonData.access_token);\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "joel_iscam",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url_local}}/token",
+							"host": [
+								"{{url_local}}"
+							],
+							"path": [
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
 						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "username",
-							"value": "joel_iscam",
-							"type": "text"
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"cliente\":\"ISCAM\",\r\n  \"origen\": \"C:\\\\Users\\\\jramos\\\\codingFiles\\\\dacodes\\\\scrapping_project_iscam\\\\GS1\\\\excel_files\",\r\n  \"destino\": \"/Joel_16/\",\r\n  \"periodo\": \"2024-02\",\r\n  \"file_name\":\"test_demo_16-02-2024\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
-						{
-							"key": "password",
-							"value": "123456",
-							"type": "text"
+						"url": {
+							"raw": "{{url_local}}/onedrive/",
+							"host": [
+								"{{url_local}}"
+							],
+							"path": [
+								"onedrive",
+								""
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{url}}/token",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"token"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "upload",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"cliente\":\"ISCAM\",\r\n  \"origen\": \"C:\\\\Users\\\\jramos\\\\codingFiles\\\\dacodes\\\\scrapping_project_iscam\\\\GS1\\\\excel_files\",\r\n  \"destino\": \"/Joel_16/\",\r\n  \"periodo\": \"2024-02\",\r\n  \"file_name\":\"test_demo_16-02-2024\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "get_all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
 						}
-					}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_local}}/onedrive",
+							"host": [
+								"{{url_local}}"
+							],
+							"path": [
+								"onedrive"
+							]
+						}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{url}}/onedrive/",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"onedrive",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get_all",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{url}}/onedrive",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"onedrive"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get_id",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{url}}/onedrive?item_id=14",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"onedrive"
-					],
-					"query": [
+				{
+					"name": "get_id",
+					"event": [
 						{
-							"key": "item_id",
-							"value": "14"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get_cliente",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{url}}/onedrive?cliente=ISCAM",
-					"host": [
-						"{{url}}"
 					],
-					"path": [
-						"onedrive"
-					],
-					"query": [
-						{
-							"key": "cliente",
-							"value": "ISCAM"
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_local}}/onedrive?item_id=14",
+							"host": [
+								"{{url_local}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "item_id",
+									"value": "14"
+								}
+							]
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get_periodo",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{url}}/onedrive?periodo=2024-02",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"onedrive"
-					],
-					"query": [
+					},
+					"response": []
+				},
+				{
+					"name": "get_cliente",
+					"event": [
 						{
-							"key": "periodo",
-							"value": "2024-02"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_local}}/onedrive?cliente=ISCAM",
+							"host": [
+								"{{url_local}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "cliente",
+									"value": "ISCAM"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_periodo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_local}}/onedrive?periodo=2024-02",
+							"host": [
+								"{{url_local}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "periodo",
+									"value": "2024-02"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_periodo_cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_local}}/onedrive?periodo=2024-02&cliente=ISCAM",
+							"host": [
+								"{{url_local}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "periodo",
+									"value": "2024-02"
+								},
+								{
+									"key": "cliente",
+									"value": "ISCAM"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "get_periodo_cliente",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{url}}/onedrive?periodo=2024-02&cliente=ISCAM",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"onedrive"
-					],
-					"query": [
+			"name": "test_iscam",
+			"item": [
+				{
+					"name": "getToken",
+					"event": [
 						{
-							"key": "periodo",
-							"value": "2024-02"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.collectionVariables.set(\"token\", jsonData.access_token);\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "joel_iscam",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								}
+							]
 						},
-						{
-							"key": "cliente",
-							"value": "ISCAM"
+						"url": {
+							"raw": "{{url_iscam}}/token",
+							"host": [
+								"{{url_iscam}}"
+							],
+							"path": [
+								"token"
+							]
 						}
-					]
+					},
+					"response": []
+				},
+				{
+					"name": "upload",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"cliente\":\"ISCAM\",\r\n  \"origen\": \"C:\\\\Users\\\\jramos\\\\codingFiles\\\\dacodes\\\\scrapping_project_iscam\\\\GS1\\\\excel_files\",\r\n  \"destino\": \"/Joel_16/\",\r\n  \"periodo\": \"2024-02\",\r\n  \"file_name\":\"test_demo_16-02-2024\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url_iscam}}/onedrive/",
+							"host": [
+								"{{url_iscam}}"
+							],
+							"path": [
+								"onedrive",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_iscam}}/onedrive",
+							"host": [
+								"{{url_iscam}}"
+							],
+							"path": [
+								"onedrive"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_iscam}}/onedrive?item_id=14",
+							"host": [
+								"{{url_iscam}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "item_id",
+									"value": "14"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_iscam}}/onedrive?cliente=ISCAM",
+							"host": [
+								"{{url_iscam}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "cliente",
+									"value": "ISCAM"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_periodo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_iscam}}/onedrive?periodo=2024-02",
+							"host": [
+								"{{url_iscam}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "periodo",
+									"value": "2024-02"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_periodo_cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_iscam}}/onedrive?periodo=2024-02&cliente=ISCAM",
+							"host": [
+								"{{url_iscam}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "periodo",
+									"value": "2024-02"
+								},
+								{
+									"key": "cliente",
+									"value": "ISCAM"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
+		},
+		{
+			"name": "test_iscam Copy",
+			"item": [
+				{
+					"name": "getToken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.collectionVariables.set(\"token\", jsonData.access_token);\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "joel_iscam",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url_server}}/token",
+							"host": [
+								"{{url_server}}"
+							],
+							"path": [
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"cliente\":\"ISCAM\",\r\n  \"origen\": \"C:\\\\Users\\\\jramos\\\\codingFiles\\\\dacodes\\\\scrapping_project_iscam\\\\GS1\\\\excel_files\",\r\n  \"destino\": \"/Joel_16/\",\r\n  \"periodo\": \"2024-02\",\r\n  \"file_name\":\"test_demo_16-02-2024\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url_server}}/onedrive/",
+							"host": [
+								"{{url_server}}"
+							],
+							"path": [
+								"onedrive",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_server}}/onedrive",
+							"host": [
+								"{{url_server}}"
+							],
+							"path": [
+								"onedrive"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_server}}/onedrive?item_id=14",
+							"host": [
+								"{{url_server}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "item_id",
+									"value": "14"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_server}}/onedrive?cliente=ISCAM",
+							"host": [
+								"{{url_server}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "cliente",
+									"value": "ISCAM"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_periodo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_server}}/onedrive?periodo=2024-02",
+							"host": [
+								"{{url_server}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "periodo",
+									"value": "2024-02"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_periodo_cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url_server}}/onedrive?periodo=2024-02&cliente=ISCAM",
+							"host": [
+								"{{url_server}}"
+							],
+							"path": [
+								"onedrive"
+							],
+							"query": [
+								{
+									"key": "periodo",
+									"value": "2024-02"
+								},
+								{
+									"key": "cliente",
+									"value": "ISCAM"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -533,13 +1233,23 @@
 	],
 	"variable": [
 		{
-			"key": "url",
+			"key": "url_local",
 			"value": "http://127.0.0.1:8000",
 			"type": "string"
 		},
 		{
 			"key": "token",
 			"value": ""
+		},
+		{
+			"key": "url_iscam",
+			"value": "http://ccazr-ssis01.iscamnet.lan:8000",
+			"type": "string"
+		},
+		{
+			"key": "url_server",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
