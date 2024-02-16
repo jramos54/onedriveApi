@@ -25,3 +25,14 @@ class RegistroCreate(RegistroBase):
     Esquema para la creación de un nuevo registro.
     """
     file_name: str  # Nombre del archivo asociado al registro.
+    
+class User(BaseModel):
+    username: str
+    password: str
+
+class UserInDB(User):
+    hashed_password: str
+
+class UserCreate(BaseModel):
+    username: str
+    password: str

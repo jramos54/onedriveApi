@@ -12,8 +12,9 @@ DATABASE=os.getenv("DATABASE")
 HOST_DATABASE=os.getenv("HOST_DATABASE")
 DATABASE_DRIVE=os.getenv("DATABASE_DRIVE")
 PORT = os.getenv("PORT_DATABASE")
-DATABASE_URL = f"{DATABASE_DRIVE}://{USER}:{PASSWORD}@{HOST_DATABASE}:{PORT}/{DATABASE}"
+DATABASE_URL = f"{DATABASE_DRIVE}://{USER}:{PASSWORD}@{HOST_DATABASE}/{DATABASE}" #{HOST_DATABASE}:{PORT}
 TABLE_NAME=os.getenv("TABLE_NAME")
+TABLE_USER=os.getenv("TABLE_USER")
 
 Base = declarative_base()
 
@@ -32,4 +33,11 @@ class RegistroUpload(Base):
     fileid=Column(String(512))
     fecha = Column(Date)    
 
+class User(Base):
+    __tablename__ = TABLE_USER
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String(255), unique=True, index=True)
+    hashed_password = Column(String(1024))
+    
 Base.metadata.create_all(bind=engine)

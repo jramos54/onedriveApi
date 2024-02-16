@@ -1,0 +1,545 @@
+{
+	"info": {
+		"_postman_id": "4da544c2-d3ec-4c53-8e3f-98a3acc4d384",
+		"name": "api_onedrive",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27477653"
+	},
+	"item": [
+		{
+			"name": "Test_microsoft",
+			"item": [
+				{
+					"name": "token_microsoft",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "e276cc97-ab7b-4651-b36a-e14c943c801e",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "2318Q~~zq-bJeiafXtw8GPA.KZt-oR1iFysTscmG",
+									"type": "text"
+								},
+								{
+									"key": "resource",
+									"value": "https://graph.microsoft.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://login.microsoft.com/777591d9-0767-4e49-8c1d-c500c81bc25e/oauth2/token",
+							"protocol": "https",
+							"host": [
+								"login",
+								"microsoft",
+								"com"
+							],
+							"path": [
+								"777591d9-0767-4e49-8c1d-c500c81bc25e",
+								"oauth2",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "token_microsoft_overcast",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = JSON.parse(responseBody);\r",
+									"pm.globals.set(\"tokenAccess\",jsonData.access_token);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "e276cc97-ab7b-4651-b36a-e14c943c801e",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "D178Q~CWuOZPOHNXVh1NqXklbEhJJPD_ArQobdmp",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "https://graph.microsoft.com/.default",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://login.microsoftonline.com/777591d9-0767-4e49-8c1d-c500c81bc25e/oauth2/v2.0/token",
+							"protocol": "https",
+							"host": [
+								"login",
+								"microsoftonline",
+								"com"
+							],
+							"path": [
+								"777591d9-0767-4e49-8c1d-c500c81bc25e",
+								"oauth2",
+								"v2.0",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSites",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAccess}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://graph.microsoft.com/v1.0/drives",
+							"protocol": "https",
+							"host": [
+								"graph",
+								"microsoft",
+								"com"
+							],
+							"path": [
+								"v1.0",
+								"drives"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "id_by_user",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAccess}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://graph.microsoft.com/v1.0/users/rpausr.01@iscam.com",
+							"protocol": "https",
+							"host": [
+								"graph",
+								"microsoft",
+								"com"
+							],
+							"path": [
+								"v1.0",
+								"users",
+								"rpausr.01@iscam.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "drive",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAccess}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://graph.microsoft.com/v1.0/users/3f27bfe2-2e9f-4745-a0b0-806d0a23de3a/drives",
+							"protocol": "https",
+							"host": [
+								"graph",
+								"microsoft",
+								"com"
+							],
+							"path": [
+								"v1.0",
+								"users",
+								"3f27bfe2-2e9f-4745-a0b0-806d0a23de3a",
+								"drives"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "shared_me",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAccess}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://graph.microsoft.com/v1.0/users/3f27bfe2-2e9f-4745-a0b0-806d0a23de3a/drive/sharedWithMe",
+							"protocol": "https",
+							"host": [
+								"graph",
+								"microsoft",
+								"com"
+							],
+							"path": [
+								"v1.0",
+								"users",
+								"3f27bfe2-2e9f-4745-a0b0-806d0a23de3a",
+								"drive",
+								"sharedWithMe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list children",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAccess}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://graph.microsoft.com/v1.0/users/3f27bfe2-2e9f-4745-a0b0-806d0a23de3a/drive/root/children",
+							"protocol": "https",
+							"host": [
+								"graph",
+								"microsoft",
+								"com"
+							],
+							"path": [
+								"v1.0",
+								"users",
+								"3f27bfe2-2e9f-4745-a0b0-806d0a23de3a",
+								"drive",
+								"root",
+								"children"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "getToken",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"token\", jsonData.access_token);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "joel_iscam",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "123456",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}/token",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "upload",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"cliente\":\"ISCAM\",\r\n  \"origen\": \"C:\\\\Users\\\\jramos\\\\codingFiles\\\\dacodes\\\\scrapping_project_iscam\\\\GS1\\\\excel_files\",\r\n  \"destino\": \"/Joel_16/\",\r\n  \"periodo\": \"2024-02\",\r\n  \"file_name\":\"test_demo_16-02-2024\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/onedrive/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"onedrive",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_all",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/onedrive",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"onedrive"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/onedrive?item_id=14",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"onedrive"
+					],
+					"query": [
+						{
+							"key": "item_id",
+							"value": "14"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_cliente",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/onedrive?cliente=ISCAM",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"onedrive"
+					],
+					"query": [
+						{
+							"key": "cliente",
+							"value": "ISCAM"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_periodo",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/onedrive?periodo=2024-02",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"onedrive"
+					],
+					"query": [
+						{
+							"key": "periodo",
+							"value": "2024-02"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_periodo_cliente",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/onedrive?periodo=2024-02&cliente=ISCAM",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"onedrive"
+					],
+					"query": [
+						{
+							"key": "periodo",
+							"value": "2024-02"
+						},
+						{
+							"key": "cliente",
+							"value": "ISCAM"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}
