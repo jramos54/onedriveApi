@@ -40,7 +40,7 @@ def authenticate_user(db: Session, username: str, password: str):
     user = get_user(db, username) 
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.Password):
         return False
     return user
 
@@ -51,5 +51,5 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 def get_user(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
+    return db.query(User).filter(User.UserName == username).first()
 

@@ -36,8 +36,8 @@ class RegistroUpload(Base):
 class User(Base):
     __tablename__ = TABLE_USER
 
-    id = Column(Integer, primary_key=True)
-    username = Column(String(255), unique=True, index=True)
-    hashed_password = Column(String(1024))
+    Id = Column(Integer, primary_key=True)
+    UserName = Column(String(255), unique=True, index=True)
+    Password = Column(String(1024))
     
 Base.metadata.create_all(bind=engine)
