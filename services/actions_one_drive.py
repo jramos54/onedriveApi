@@ -1,3 +1,4 @@
+import asyncio
 import aiohttp,json, os
 from dotenv import load_dotenv
 import requests
@@ -103,6 +104,7 @@ class AppApiOneDrive:
                 resp = await response.json()
                 self.access_token = resp['access_token']
 
+
     async def get_idUser(self):
         ID_USER_URL = f"https://graph.microsoft.com/v1.0/users/{self.iscam_user}"
         headers = {
@@ -115,6 +117,7 @@ class AppApiOneDrive:
                 resp = await response.json()
                 print(resp)
                 self.id_user = resp['id']
+
 
     async def upload_file(self, onedrivefile, onedrivepath, localpath):
         GAPH_URL = f"https://graph.microsoft.com/v1.0/users/{self.id_user}/drive/root"
@@ -141,6 +144,7 @@ class AppApiOneDrive:
                 else:
                     resp = await response.json()
                     print("\n\nError al subir el archivo:", resp)
+    
     
     async def upload_to_shared(self, onedrivefile, onedrivepath, localpath):
         GAPH_URL = f"https://graph.microsoft.com/v1.0/drives/{self.drive_shared_id}/items/{self.shared_id}"
@@ -182,4 +186,74 @@ class AppApiOneDrive:
                 self.shared_id= resp['value'][0]['id']
                 print(self.drive_shared_id)
                 print(self.shared_id)
-    
+                
+                
+    async def create_upload_session(self, onedrive_path):
+        # GAPH_URL = f"https://graph.microsoft.com/v1.0/users/{self.id_user}/drive/root:/{onedrive_path}:/createUploadSession"
+        GAPH_URL = f"https://graph.microsoft.com/v1.0/drives/{self.drive_shared_id}/items/{self.shared_id}:/{onedrive_path}:/createUploadSession"
+
+        
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Content-Type": "application/json"
+        }
+        async with aiohttp.ClientSession() as session:
+            async with session.post(GAPH_URL, headers=headers, json={}) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    print(data)
+                    return data.get('uploadUrl')
+                else:
+                    data = await response.json()
+
+                    print(data)
+                    return None
+
+
+    async def upload_large_file(self, onedrive_path, local_file_path):
+        upload_url = await self.create_upload_session(onedrive_path)
+        if not upload_url:
+            print("Error al crear la sesión de carga.")
+            return None
+
+        file_size = os.path.getsize(local_file_path)
+        fragment_size = 320 * 1024  # 320 KiB
+
+        respuesta = None
+        start = 0
+        max_retries = 5 
+        while start < file_size:
+            end = min(start + fragment_size, file_size)
+            headers = {
+                "Content-Length": str(end - start),
+                "Content-Range": f"bytes {start}-{end-1}/{file_size}"
+            }
+
+            with open(local_file_path, 'rb') as file:
+                file.seek(start)
+                data = file.read(end - start)
+
+            attempt = 0
+            while attempt < max_retries:
+                async with aiohttp.ClientSession() as session:
+                    async with session.put(upload_url, headers=headers, data=data) as response:
+                        if response.status in (200, 201, 202):
+                            respuesta = await response.json()
+                            print(f"Fragmento cargado: {start}-{end-1}. Progreso: {100 * end / file_size:.2f}%")
+                            break
+                        elif response.status == 416:
+                            print(f"El fragmento {start}-{end-1} ya está cargado. Saltando al siguiente.")
+                            break
+                        else:
+                            print(f"Error en la carga del fragmento: {start}-{end-1}. Reintentando... Intento {attempt + 1}")
+                            attempt += 1
+                            await asyncio.sleep(2 ** attempt)
+
+                if attempt == max_retries:
+                    print(f"Error al subir el fragmento: {start}-{end-1}. Máximos intentos alcanzados.")
+                    return None
+
+            start = end
+
+        print("Archivo subido con éxito.")
+        return respuesta

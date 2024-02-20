@@ -16,8 +16,10 @@ class Registro(RegistroBase):
     Esquema para representar un registro completo.
     """
     id: Optional[int] = None  # Identificador único del registro (opcional).
-    urldestino: str  # URL de destino del registro.
-    fileid: str  # ID del archivo asociado al registro.
+    urldestino: Optional[str] = None  # URL de destino del registro.
+    fileid: Optional[str] = None  # ID del archivo asociado al registro.
+    task_id:str
+    status:str
     fecha: date  # Fecha del registro.
 
 class RegistroCreate(RegistroBase):

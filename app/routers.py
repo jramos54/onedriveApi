@@ -1,13 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status,BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from .schemas import Registro,RegistroCreate
 from .models import RegistroUpload, Session,User
-from services.crud import create_onedrive, get_onedrive
+from services.crud import create_onedrive, get_onedrive, create_onedrive_lage,create_task,get_task_status
 from services.authenticate_methods import authenticate_user, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, verify_token
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from datetime import timedelta
+import uuid
 
 
 router = APIRouter()
@@ -96,6 +97,7 @@ async def get_onedrive_api(
         page : Página solicitada.
 
     Returns:
+    
         [
             {
             cliente: Cliente asociado al registro.
@@ -127,6 +129,16 @@ async def get_onedrive_api(
 
 @router.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """ Endpoint para obtener token
+
+    Args:
+        username : Usuario
+        password : Contraseña
+
+    Returns:
+        access_token: Token de sesion 5 min tiempo de duracion. 
+        token_type: Bearer
+    """
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -139,4 +151,67 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
         data={"sub": user.UserName}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/onedrive/large-file", response_model=Registro)
+async def create_onedrive_large(
+    background_tasks: BackgroundTasks, 
+    registro_data: RegistroCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)):
+    """ End point para subir un archivo a one drive con tamaño > 1 Gb
+    
+    Args:
+    
+        cliente: Cliente asociado al registro.
+        
+        origen: Origen del registro.
+        
+        destino: Destino del registro.
+        
+        periodo: Período del registro.
+        
+        file_name: Nombre del archivo asociado al registro.
+
+    Returns:
+    
+        cliente: Cliente asociado al registro.
+        
+        origen: Origen del registro.
+        
+        destino: Destino del registro.
+        
+        periodo: Período del registro.
+        
+        id: Identificador único del registro 
+        
+        urldestino: URL de destino del registro.
+        
+        fileid: ID del archivo asociado al registro.
+        
+        fecha: Fecha del registro.
+    """
+    
+    task_id = str(uuid.uuid4())
+    status_task="task created"
+    response=await create_task(db,registro_data,task_id,status_task)
+ 
+    background_tasks.add_task( create_onedrive_lage, db, registro_data, task_id)
+    
+    response=get_task_status(db,task_id)
+    return response
+
+
+@router.get("/onedrive/large-file", response_model=Registro)
+async def get_upload_status(
+    task_id: str, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)):
+    """ Consulta del estatus de carga de un archivo mediante un task_id"""
+    
+    registro = get_task_status(db, task_id)
+    if registro:
+        return registro
+    else:
+        raise HTTPException(status_code=404, detail="Task not found")
 

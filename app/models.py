@@ -31,6 +31,8 @@ class RegistroUpload(Base):
     periodo = Column(String(512), index=True)
     urldestino = Column(String(512))
     fileid=Column(String(512))
+    task_id=Column(String(1024))
+    status=Column(String(128))
     fecha = Column(Date)    
 
 class User(Base):
