@@ -222,6 +222,11 @@ class AppApiOneDrive:
         respuesta = None
         start = 0
         max_retries = 5 
+        
+        expiration_date, next_expected_ranges = await self.get_upload_status(upload_url)
+        if next_expected_ranges:
+            start = int(next_expected_ranges[0].split('-')[0])
+        
         while start < file_size:
             end = min(start + fragment_size, file_size)
             headers = {
@@ -257,3 +262,12 @@ class AppApiOneDrive:
 
         print("Archivo subido con éxito.")
         return respuesta
+
+    async def get_upload_status(self, upload_url):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(upload_url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data["expirationDateTime"], data["nextExpectedRanges"]
+                else:
+                    return None, None
