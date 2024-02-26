@@ -8,6 +8,8 @@ from .onedrive import OneDriveApi
 from .actions_one_drive import AppApiOneDrive
 import os
 import traceback
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 
 async def create_onedrive(db: Session, registro_data: RegistroCreate):
@@ -84,8 +86,16 @@ def get_onedrive(
 async def create_onedrive_lage(db: Session, registro_data: RegistroCreate, task_id: str):
     update_task_status(db, task_id, "Process Started")
     
+    # zipObject = ZipFiles(registro_data.file_name)
+    # dir_resultante = await zipObject.comprimir_directorio(registro_data.origen)
+    executor = ThreadPoolExecutor(max_workers=4)
     zipObject = ZipFiles(registro_data.file_name)
-    dir_resultante = await zipObject.comprimir_directorio(registro_data.origen)
+
+    try:
+        dir_resultante = await asyncio.get_event_loop().run_in_executor(executor, zipObject.comprimir_directorio, registro_data.origen)
+    finally:
+        executor.shutdown(wait=True)
+        
     print(dir_resultante)
 
     onedrive_api = AppApiOneDrive()

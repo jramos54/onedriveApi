@@ -7,7 +7,7 @@ class ZipFiles:
     def __init__(self, file_name: str):
         self.archivo_zip = f"{file_name}.zip"
         
-    async def comprimir_directorio(self, directorio: str) -> str:
+    def comprimir_directorio(self, directorio: str) -> str:
         carpeta_temporal = "temporales"
         if not os.path.exists(carpeta_temporal):
             os.makedirs(carpeta_temporal)
