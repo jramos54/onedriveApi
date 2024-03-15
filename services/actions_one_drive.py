@@ -210,6 +210,60 @@ class AppApiOneDrive:
                     return None
 
 
+    # async def upload_large_file(self, onedrive_path, local_file_path):
+    #     upload_url = await self.create_upload_session(onedrive_path)
+    #     if not upload_url:
+    #         print("Error al crear la sesión de carga.")
+    #         return None
+
+    #     file_size = os.path.getsize(local_file_path)
+    #     fragment_size = 320 * 1024  # 320 KiB
+
+    #     respuesta = None
+    #     start = 0
+    #     max_retries = 5 
+        
+    #     expiration_date, next_expected_ranges = await self.get_upload_status(upload_url)
+    #     if next_expected_ranges:
+    #         start = int(next_expected_ranges[0].split('-')[0])
+        
+       
+    #     while start < file_size:
+    #         end = min(start + fragment_size, file_size)
+    #         headers = {
+    #             "Content-Length": str(end - start),
+    #             "Content-Range": f"bytes {start}-{end-1}/{file_size}"
+    #         }
+
+    #         with open(local_file_path, 'rb') as file:
+    #             file.seek(start)
+    #             data = file.read(end - start)
+
+    #         attempt = 0
+    #         while attempt < max_retries:
+    #             async with aiohttp.ClientSession() as session:
+    #                 async with session.put(upload_url, headers=headers, data=data) as response:
+    #                     if response.status in (200, 201, 202):
+    #                         respuesta = await response.json()
+    #                         print(f"Fragmento cargado: {start}-{end-1}. Progreso: {100 * end / file_size:.2f}%")
+    #                         break
+    #                     elif response.status == 416:
+    #                         print(f"El fragmento {start}-{end-1} ya está cargado. Saltando al siguiente.")
+    #                         break
+    #                     else:
+    #                         print(f"Error en la carga del fragmento: {start}-{end-1}. Reintentando... Intento {attempt + 1}")
+    #                         attempt += 1
+    #                         await asyncio.sleep(2 ** attempt)
+
+    #             if attempt == max_retries:
+    #                 print(f"Error al subir el fragmento: {start}-{end-1}. Máximos intentos alcanzados.")
+    #                 return None
+
+    #         start = end
+
+    #     print("Archivo subido con éxito.")
+    #     return respuesta
+
     async def upload_large_file(self, onedrive_path, local_file_path):
         upload_url = await self.create_upload_session(onedrive_path)
         if not upload_url:
@@ -217,7 +271,7 @@ class AppApiOneDrive:
             return None
 
         file_size = os.path.getsize(local_file_path)
-        fragment_size = 320 * 1024  # 320 KiB
+        fragment_size = 6*320 * 1024  # 320 KiB
 
         respuesta = None
         start = 0
@@ -227,20 +281,20 @@ class AppApiOneDrive:
         if next_expected_ranges:
             start = int(next_expected_ranges[0].split('-')[0])
         
-        while start < file_size:
-            end = min(start + fragment_size, file_size)
-            headers = {
-                "Content-Length": str(end - start),
-                "Content-Range": f"bytes {start}-{end-1}/{file_size}"
-            }
+        async with aiohttp.ClientSession() as session:
+            while start < file_size:
+                end = min(start + fragment_size, file_size)
+                headers = {
+                    "Content-Length": str(end - start),
+                    "Content-Range": f"bytes {start}-{end-1}/{file_size}"
+                }
 
-            with open(local_file_path, 'rb') as file:
-                file.seek(start)
-                data = file.read(end - start)
+                with open(local_file_path, 'rb') as file:
+                    file.seek(start)
+                    data = file.read(end - start)
 
-            attempt = 0
-            while attempt < max_retries:
-                async with aiohttp.ClientSession() as session:
+                attempt = 0
+                while attempt < max_retries:
                     async with session.put(upload_url, headers=headers, data=data) as response:
                         if response.status in (200, 201, 202):
                             respuesta = await response.json()
@@ -254,11 +308,11 @@ class AppApiOneDrive:
                             attempt += 1
                             await asyncio.sleep(2 ** attempt)
 
-                if attempt == max_retries:
-                    print(f"Error al subir el fragmento: {start}-{end-1}. Máximos intentos alcanzados.")
-                    return None
+                    if attempt == max_retries:
+                        print(f"Error al subir el fragmento: {start}-{end-1}. Máximos intentos alcanzados.")
+                        return None
 
-            start = end
+                start = end
 
         print("Archivo subido con éxito.")
         return respuesta

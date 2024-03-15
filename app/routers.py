@@ -34,42 +34,42 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     )
     return verify_token(token, credentials_exception)
 
-@router.post("/onedrive/", response_model=Registro)
-async def create_onedrive_api( registro: RegistroCreate, db: Session = Depends(get_db),current_user: User = Depends(get_current_user),):
-    """
-    Endpoint para crear un registro en OneDrive.
+# @router.post("/onedrive/", response_model=Registro)
+# async def create_onedrive_api( registro: RegistroCreate, db: Session = Depends(get_db),current_user: User = Depends(get_current_user),):
+#     """
+#     Endpoint para crear un registro en OneDrive.
 
-    Args:
+#     Args:
     
-        cliente: Cliente asociado al registro.
+#         cliente: Cliente asociado al registro.
         
-        origen: Origen del registro.
+#         origen: Origen del registro.
         
-        destino: Destino del registro.
+#         destino: Destino del registro.
         
-        periodo: Período del registro.
+#         periodo: Período del registro.
         
-        file_name: Nombre del archivo asociado al registro.
+#         file_name: Nombre del archivo asociado al registro.
 
-    Returns:
+#     Returns:
     
-        cliente: Cliente asociado al registro.
+#         cliente: Cliente asociado al registro.
         
-        origen: Origen del registro.
+#         origen: Origen del registro.
         
-        destino: Destino del registro.
+#         destino: Destino del registro.
         
-        periodo: Período del registro.
+#         periodo: Período del registro.
         
-        id: Identificador único del registro 
+#         id: Identificador único del registro 
         
-        urldestino: URL de destino del registro.
+#         urldestino: URL de destino del registro.
         
-        fileid: ID del archivo asociado al registro.
+#         fileid: ID del archivo asociado al registro.
         
-        fecha: Fecha del registro.
-    """
-    return await create_onedrive(db, registro)
+#         fecha: Fecha del registro.
+#     """
+#     return await create_onedrive(db, registro)
 
 @router.get("/onedrive", response_model=List[Registro])
 async def get_onedrive_api(

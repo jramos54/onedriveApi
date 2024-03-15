@@ -19,6 +19,18 @@ class ZipFiles:
         
         return os.path.abspath(os.path.join(carpeta_temporal, self.archivo_zip))
 
+    
+    def verificar_integridad(self) -> bool:
+        with zipfile.ZipFile(os.path.join("temporales", self.archivo_zip), 'r') as zipf:
+            try:
+                zipf.extractall("temporales/extracted")
+                return True
+            except Exception as e:
+                print(f"Error al extraer el archivo ZIP: {e}")
+                return False
+            finally:
+                shutil.rmtree("temporales/extracted", ignore_errors=True)
+            
     async def eliminar_zip(self):
         Path(os.path.join("temporales", self.archivo_zip)).unlink(missing_ok=True)
 

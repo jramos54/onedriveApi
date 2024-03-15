@@ -10,7 +10,7 @@ import os
 import traceback
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-
+import time
 
 async def create_onedrive(db: Session, registro_data: RegistroCreate):
     
@@ -84,78 +84,91 @@ def get_onedrive(
     return items
 
 async def create_onedrive_lage(db: Session, registro_data: RegistroCreate, task_id: str):
+    start_time = time.time()
+
     update_task_status(db, task_id, "Process Started")
     
-    # zipObject = ZipFiles(registro_data.file_name)
-    # dir_resultante = await zipObject.comprimir_directorio(registro_data.origen)
     executor = ThreadPoolExecutor(max_workers=4)
     zipObject = ZipFiles(registro_data.file_name)
 
     try:
         dir_resultante = await asyncio.get_event_loop().run_in_executor(executor, zipObject.comprimir_directorio, registro_data.origen)
+        integridad = await asyncio.get_event_loop().run_in_executor(executor, zipObject.verificar_integridad)
+        
+        if not integridad:
+            update_task_status(db, task_id, "Failed Integrity")
+            return get_task_status(db, task_id)
+
+        update_task_status(db, task_id, "Zip Completed")
+        
+        print(dir_resultante)
+
+        onedrive_api = AppApiOneDrive()
+        await onedrive_api.get_token()
+        await onedrive_api.get_idUser()
+        await onedrive_api.get_shared_ids()
+
+        max_retries = 5  # Número de reintentos para la carga
+        for attempt in range(max_retries):
+            try:
+                update_task_status(db, task_id, "Uploading")
+                
+                path_destino = os.path.join(registro_data.destino, registro_data.file_name + '.zip')
+                response_onedrive = await onedrive_api.upload_large_file(path_destino, dir_resultante)
+
+                if response_onedrive:
+                    await zipObject.eliminar_zip()
+                    print(response_onedrive)
+
+                    registro = Registro(
+                        cliente=registro_data.cliente,
+                        origen=registro_data.origen,
+                        destino=registro_data.destino,
+                        periodo=registro_data.periodo,
+                        urldestino=response_onedrive.get("webUrl"),
+                        fileid=response_onedrive.get("id"),
+                        task_id=task_id,
+                        status="Completed",
+                        fecha=date.today()
+                    )
+
+                    db_registro = db.query(RegistroUpload).filter(RegistroUpload.task_id == task_id).first()
+                    if db_registro:
+                        # Actualizar el registro existente
+                        db_registro.cliente = registro.cliente
+                        db_registro.origen = registro.origen
+                        db_registro.destino = registro.destino
+                        db_registro.periodo = registro.periodo
+                        db_registro.urldestino = registro.urldestino
+                        db_registro.fileid = registro.fileid
+                        db_registro.status = registro.status
+                        db_registro.fecha = registro.fecha
+
+                        db.commit()
+                        db.refresh(db_registro)
+
+                    break  # Salir del bucle si la carga es exitosa
+
+            except Exception as e:
+                print(f"Error en el intento {attempt + 1}: {e}")
+                traceback.print_exc()
+
+                if attempt < max_retries - 1:
+                    print("Reintentando la carga...")
+                    continue  # Intentar nuevamente
+                else:
+                    update_task_status(db, task_id, "Fail")
+                    # Si se alcanza el máximo de reintentos, retorna el estado de la tarea
+                    return get_task_status(db, task_id)
+
     finally:
         executor.shutdown(wait=True)
-        
-    print(dir_resultante)
-
-    onedrive_api = AppApiOneDrive()
-    await onedrive_api.get_token()
-    await onedrive_api.get_idUser()
-    await onedrive_api.get_shared_ids()
-
-    max_retries = 3  # Número de reintentos para la carga
-    for attempt in range(max_retries):
-        try:
-            update_task_status(db, task_id, "Uploading")
-            
-            path_destino = os.path.join(registro_data.destino, registro_data.file_name + '.zip')
-            response_onedrive = await onedrive_api.upload_large_file(path_destino, dir_resultante)
-
-            if response_onedrive:
-                await zipObject.eliminar_zip()
-                print(response_onedrive)
-
-                registro = Registro(
-                    cliente=registro_data.cliente,
-                    origen=registro_data.origen,
-                    destino=registro_data.destino,
-                    periodo=registro_data.periodo,
-                    urldestino=response_onedrive.get("webUrl"),
-                    fileid=response_onedrive.get("id"),
-                    task_id=task_id,
-                    status="Complete",
-                    fecha=date.today()
-                )
-
-                db_registro = db.query(RegistroUpload).filter(RegistroUpload.task_id == task_id).first()
-                if db_registro:
-                    # Actualizar el registro existente
-                    db_registro.cliente = registro.cliente
-                    db_registro.origen = registro.origen
-                    db_registro.destino = registro.destino
-                    db_registro.periodo = registro.periodo
-                    db_registro.urldestino = registro.urldestino
-                    db_registro.fileid = registro.fileid
-                    db_registro.status = registro.status
-                    db_registro.fecha = registro.fecha
-
-                    db.commit()
-                    db.refresh(db_registro)
-
-                break  # Salir del bucle si la carga es exitosa
-
-        except Exception as e:
-            print(f"Error en el intento {attempt + 1}: {e}")
-            traceback.print_exc()
-
-            if attempt < max_retries - 1:
-                print("Reintentando la carga...")
-                continue  # Intentar nuevamente
-            else:
-                update_task_status(db, task_id, "Fail")
-                # Si se alcanza el máximo de reintentos, retorna el estado de la tarea
-                return get_task_status(db, task_id)
+    
+    end_time = time.time()
+    duration = end_time - start_time
+    print(f"Tiempo de ejecución del proceso: {duration} segundos")
     return get_task_status(db, task_id)
+
         
     
 
