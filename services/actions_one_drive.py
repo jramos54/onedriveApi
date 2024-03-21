@@ -271,7 +271,7 @@ class AppApiOneDrive:
             return None
 
         file_size = os.path.getsize(local_file_path)
-        fragment_size = 6*320 * 1024  # 320 KiB
+        fragment_size = 32*320 * 1024  # 320 KiB
 
         respuesta = None
         start = 0

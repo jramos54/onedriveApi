@@ -1,7 +1,9 @@
 import os
 import zipfile
 from pathlib import Path
-import shutil 
+import shutil , logging, time
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class ZipFiles:
     def __init__(self, file_name: str):
@@ -11,12 +13,20 @@ class ZipFiles:
         carpeta_temporal = "temporales"
         if not os.path.exists(carpeta_temporal):
             os.makedirs(carpeta_temporal)
+            logging.info(f"Carpeta temporal '{carpeta_temporal}' creada")
+        
+        inicio = time.time() 
+        logging.info(f"Iniciando la compresión del directorio {directorio}")
         
         with zipfile.ZipFile(os.path.join(carpeta_temporal, self.archivo_zip), 'w', zipfile.ZIP_DEFLATED) as zipf:
             for root, dirs, files in os.walk(directorio):
                 for file in files:
                     zipf.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), os.path.join(directorio, '..')))
+                    logging.info(f"Archivo {file} agregado al zip")
         
+        duracion = time.time() - inicio 
+        logging.info(f"Directorio {directorio} comprimido en {duracion:.2f} segundos")
+                   
         return os.path.abspath(os.path.join(carpeta_temporal, self.archivo_zip))
 
     
